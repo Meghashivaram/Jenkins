@@ -1,43 +1,34 @@
-<project name="ant-sample" basedir="." default="build">
-
-    <!-- properties -->
-    <property name="src.dir"     value="src"/>
-    <property name="build.dir"   value="build"/>
-    <property name="classes.dir" value="${build.dir}/classes"/>
-    <property name="war.dir"     value="${build.dir}/war"/>
-    <property name="doc.dir"     value="doc"/>
-
-    <!-- targets -->
-    <target name="compile" description="compile project">
-        <mkdir dir="${classes.dir}"/>
-        <javac srcdir="${src.dir}" destdir="${classes.dir}" includeantruntime="false"/>
+<?xml version="1.0" ?> 
+<project name="AntWarFileExample" default="war">
+ 
+    <path id="compile.classpath">
+        <fileset dir="WebContent/WEB-INF/lib">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+     
+    <target name="init">
+        <mkdir dir="build/classes"/>
+        <mkdir dir="dist" />
     </target>
-
-    <target name="war" depends="compile" description="generate the distribution war">
-        <mkdir dir="${war.dir}"/>
-        <war destfile="${war.dir}/${ant.project.name}.war" basedir="${classes.dir}">
-            <manifest>
-                <attribute name="Main-Class" value="piona.Main"/>
-            </manifest>
+     
+    <target name="compile" depends="init" >
+        <javac destdir="build/classes" debug="true" srcdir="src">
+            <classpath refid="compile.classpath"/>
+        </javac>
+    </target>
+     
+    <target name="war" depends="compile">
+        <war destfile="dist/MyWebApplication.war" webxml="WebContent/WEB-INF/web.xml">
+            <fileset dir="WebContent"/>
+            <lib dir="WebContent/WEB-INF/lib"/>
+            <classes dir="build/classes"/>
         </war>
     </target>
-
-    <target name="run" depends="war" description="run application">
-        <java war="${war.dir}/${ant.project.name}.war" fork="true"/>
+     
+    <target name="clean">
+        <delete dir="dist" />
+        <delete dir="build" />
     </target>
-
-    <target name="build" depends="war" description="build application"/>
-
-    <target name="doc" description="generate documentation">
-        <mkdir dir="${doc.dir}" />
-        <javadoc destdir="${doc.dir}" sourcepath="${src.dir}"/>
-    </target>
-
-    <target name="clean" description="clean up build files">
-        <delete dir="${build.dir}"/>
-        <delete dir="${doc.dir}" />
-    </target>
-
-    <target name="rebuild" depends="clean,build" description="rebuild application"/>
-
+     
 </project>
